@@ -161,33 +161,3 @@ Errors use a consistent JSON shape:
   "code": 404
 }
 ```
-
-## Concurrency and export
-
-[`EmployeeService.Export`](services/employee_service.go) loads the employee list once, then exports JSON and CSV concurrently in two goroutines. A `sync.WaitGroup` waits for both exports, while a `sync.Mutex` protects the shared error collection.
-
-The export capability is implemented and tested at the service layer. The current HTTP API does not expose an export endpoint because the provided requirements do not define one.
-
-The file repository uses `sync.RWMutex` to protect concurrent reads and writes. Storage updates are written to a temporary file and renamed over `data/storage.json` to reduce the risk of a partially written storage file.
-
-## Testing
-
-Run all tests:
-
-```bash
-go test ./...
-```
-
-Run the race detector:
-
-```bash
-go test -race ./...
-```
-
-Run static analysis:
-
-```bash
-go vet ./...
-```
-
-The test suite covers service validation, JSON/CSV export, file persistence, pagination, partial updates, concurrent repository writes, and the main employee HTTP flow.
